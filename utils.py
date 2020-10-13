@@ -1,3 +1,5 @@
+import datetime
+
 import config
 
 
@@ -50,3 +52,44 @@ def format_name_for_url(name):
         if 'Strange' not in word:
             fin_name += word + '%20'
     return fin_name[0:-3]
+
+
+def save_auction_info(items, bid, bid_type):
+    file = open("info.txt", 'a')
+    file.write('timestamp: {0}\n'.format(datetime.datetime.now()))
+    file.write("{0} bis is {1}\n".format(bid_type, bid))
+    for item in items:
+        file.write('stats:\n')
+        write_dict(file, items)
+        file.write("------------------------------------\n")
+    file.close()
+
+
+def save_auction_info(stats):
+    file = open("info.txt", 'a')
+    file.write('timestamp: {0}\n'.format(datetime.datetime.now()))
+    for item in stats:
+        file.write('{0} stats:\n'.format(item['name']))
+        write_dict(file, item)
+        file.write("------------------------------------\n")
+    file.close()
+
+
+def save_auction_info(items, stats, bid, bid_type):
+    file = open("info.txt", 'a')
+    file.write('timestamp: {0}\n'.format(datetime.datetime.now()))
+    file.write("{0} bis is {1}\n".format(bid_type, bid))
+    for item in items:
+        file.write('stats:\n')
+        write_dict(file, item)
+        file.write("------------------------------------\n")
+    for item in stats:
+        file.write('{0} stats:\n'.format(item['name']))
+        write_dict(file, item)
+        file.write("------------------------------------\n")
+    file.close()
+
+
+def write_dict(file, dictionary):
+    for el in dictionary:
+        file.write(str(el) + ": " + str(dictionary[el]) + '\n')

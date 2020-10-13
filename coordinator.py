@@ -49,6 +49,22 @@ def start():
         elif user_input == 5:
             need_to_get_items = True
             utils.set_auction_id()
+        elif user_input == 6:
+            save_params(items)
+
+def save_params(items):
+    print('params:\n -scrap - scrap only\n-bptf - bt data only\n-all - all data')
+    flag = input('Enter param: ')
+    if '-all' in flag:
+        bid, bid_type = get_bids()
+        utils.save_auction_info(items, backpacktf_scraper.get_stats(items), bid, bid_type)
+    elif '-scrap' in flag:
+        bid, bid_type = get_bids()
+        utils.save_auction_info(items, bid, bid_type)
+    elif '-bptf' in flag:
+        utils.save_auction_info(backpacktf_scraper.get_stats(items))
+    else:
+        pass
 
 
 # displays the result of scraping scrap.tf auction to the user
@@ -115,3 +131,5 @@ def show_menu():
     print('3: bp.tf only')
     print('4: update the bid')
     print('5: change AUC_ID')
+    print('6: save auction data')
+
