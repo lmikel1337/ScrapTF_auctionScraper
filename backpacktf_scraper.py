@@ -54,7 +54,7 @@ def create_url(item):
 
     if item['particle_effect'] is not None:
         url = add_particle_effect_param_to_url(item['particle_effect'], url)
-    if item["killstreak"] is not None:
+    if item["killstreak"] is not None or item['slot'] == 'primary' or item['slot'] == 'secondary' or item['slot'] == 'melee':
         url = add_killstreak_param_to_url(item["killstreak"], url)
     # url = add_base_params(url, item)
     return url
