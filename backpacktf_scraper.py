@@ -61,9 +61,10 @@ def create_url(item):
 
 
 # add a slot param to the url
-def add_slot_param_to_url(slot, url):
+def add_slot_param_to_url(slot, name, url):
     if slot == 'taunt':
-        url = url + 'Taunt%3A%20'
+        if name != 'Shred Alert':  # An axception to the naming convention, therefore
+            url = url + 'Taunt%3A%20'
     return url
 
 
