@@ -52,6 +52,7 @@ def start():
         elif user_input == 6:
             save_params(items)
 
+
 def save_params(items):
     print('params:\n -scrap - scrap only\n-bptf - bt data only\n-all - all data')
     flag = input('Enter param: ')
