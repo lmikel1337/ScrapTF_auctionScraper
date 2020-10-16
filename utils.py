@@ -5,11 +5,11 @@ import config
 
 # uf called, forces a user to enter a value the len of an auction id
 # Note that it doesn't check whether it's a valid id, only that it has the right len
-def set_auction_id():
+def set_auction_id_from_user():
     for j in range(0, 100):
         user_input = input("Enter AUC_ID: ")
-        if user_input == 0:
-            break
+        if user_input == '0':
+            return 1
         elif len(user_input) == 6:
             config.auction_id = user_input
             print('AUC_ID set')

@@ -48,7 +48,7 @@ def get_stats(items):
 # creates the base url and oversees the addition of correct params
 def create_url(item):
     url = 'https://backpack.tf/classifieds?item='
-    url = add_slot_param_to_url(item["slot"], url)
+    url = add_slot_param_to_url(item["slot"], item["name"], url)
     url = add_name_param_to_url(item["name"], url)
     url = add_quality_param_to_url(item['quality'], url)
 
