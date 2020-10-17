@@ -5,7 +5,7 @@ import utils
 
 # this is where the magic happens
 def start():
-    utils.set_auction_id()
+    utils.set_auction_id_from_user()
 
     show_menu()
 
@@ -37,20 +37,32 @@ def start():
         if user_input == 0:
             break
         elif user_input == 1:
-            display_scraptf(items)
-            display_bptf(items)
+            browse_mode()
         elif user_input == 2:
             display_scraptf(items)
         elif user_input == 3:
             display_bptf(items)
         elif user_input == 4:
             need_to_get_items = True
-            display_bid()
+            display_scraptf(items)
+            display_bptf(items)
         elif user_input == 5:
-            need_to_get_items = True
-            utils.set_auction_id()
+            display_bid()
         elif user_input == 6:
+            need_to_get_items = True
+            utils.set_auction_id_from_user()
+        elif user_input == 7:
             save_params(items)
+
+
+def browse_mode():
+    print("Enter 0 to exit the browsing mode")
+    for j in range(1, 100):
+        res = utils.set_auction_id_from_user()
+        if res == 1:
+            break
+        items = get_items()
+        display_bptf(items)
 
 
 def save_params(items):
@@ -95,16 +107,15 @@ def display_bptf(items_to_scrape):
     print('Links:')
     print('________________________________________')
     for stat_instance in stats:
-        print('{0}:'.format(stat_instance["name"]))
         print('Item\'s URL: {0}'.format(stat_instance["item_url"]))
         if stat_instance["paint_url"] is not None:
-            print('paint\'s URL: {0}'.format(stat_instance["paint_url"]))
+            print('paint: {0}\nURL: {1}'.format(items_to_scrape[stats.index(stat_instance)]["paint"], stat_instance["paint_url"]))
         if stat_instance["spells_url"] is not None:
             for spell in stat_instance["spells_url"]:
-                print('spell No.{0}: {1}'.format(stat_instance["spells_url"].index(spell), spell))
+                print('spell: {0}\nURL: {1}'.format(items_to_scrape[stats.index(stat_instance)]["spell(s)"], spell))
         if stat_instance["parts_url"] is not None:
             for part in stat_instance["parts_url"]:
-                print('part No.{0}: {1}'.format(stat_instance["parts_url"].index(part), part))
+                print('part: {0}\nURL: {1}'.format(items_to_scrape[stats.index(stat_instance)]["part(s)"], part))
         print('________________________________________')
 
 
@@ -126,11 +137,12 @@ def get_items():
 def show_menu():
     print('Select mode:')
     print('0: exit')
-    print("1: scrape auction page by AUC_ID and URLs to the bp.tf classified listings of the item ans it's relevant"
-          " attachments")
+    print("1: browsing mode")
     print('2: scrap.tf only')
     print('3: bp.tf only')
-    print('4: update the bid')
-    print('5: change AUC_ID')
-    print('6: save auction data')
+    print("4: scrape auction page by AUC_ID and URLs to the bp.tf classified listings of the item ans it's relevant"
+          " attachments")
+    print('5: update the bid')
+    print('6: change AUC_ID')
+    print('7: save auction data')
 

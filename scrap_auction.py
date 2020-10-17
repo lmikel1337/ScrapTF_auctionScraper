@@ -103,7 +103,7 @@ def get_auction_items_dict(lists_of_properties):
 
         for prop in property_list:
 
-            # getting item name
+            # getting item's name
             if 'data-title' in prop:
                 data = prop.split('"')
                 if data[-1] is not '':
@@ -118,6 +118,13 @@ def get_auction_items_dict(lists_of_properties):
                     is_festive = True
                 if 'Taunt: ' in name:
                     name = name.split(': ')[-1]
+                if 'Vintage ' in name:
+                    print(name)
+                    print(type(name))
+                    name = name.split(' ')[1:]
+                    string = ' '
+                    name = string.join(name)
+
             # ==================================
 
             # getting item slot
