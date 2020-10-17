@@ -58,11 +58,11 @@ def start():
 def browse_mode():
     print("Enter 0 to exit the browsing mode")
     for j in range(1, 100):
+        items = get_items()
+        display_bptf(items)
         res = utils.set_auction_id_from_user()
         if res == 1:
             break
-        items = get_items()
-        display_bptf(items)
 
 
 def save_params(items):
@@ -145,4 +145,3 @@ def show_menu():
     print('5: update the bid')
     print('6: change AUC_ID')
     print('7: save auction data')
-
