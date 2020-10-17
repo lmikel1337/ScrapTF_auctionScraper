@@ -107,16 +107,15 @@ def display_bptf(items_to_scrape):
     print('Links:')
     print('________________________________________')
     for stat_instance in stats:
-        print('{0}:'.format(stat_instance["name"]))
         print('Item\'s URL: {0}'.format(stat_instance["item_url"]))
         if stat_instance["paint_url"] is not None:
-            print('paint\'s URL: {0}'.format(stat_instance["paint_url"]))
+            print('paint: {0}\nURL: {1}'.format(items_to_scrape[stats.index(stat_instance)]["paint"], stat_instance["paint_url"]))
         if stat_instance["spells_url"] is not None:
             for spell in stat_instance["spells_url"]:
-                print('spell No.{0}: {1}'.format(stat_instance["spells_url"].index(spell), spell))
+                print('spell: {0}\nURL: {1}'.format(items_to_scrape[stats.index(stat_instance)]["spell(s)"], spell))
         if stat_instance["parts_url"] is not None:
             for part in stat_instance["parts_url"]:
-                print('part No.{0}: {1}'.format(stat_instance["parts_url"].index(part), part))
+                print('part: {0}\nURL: {1}'.format(items_to_scrape[stats.index(stat_instance)]["part(s)"], part))
         print('________________________________________')
 
 
