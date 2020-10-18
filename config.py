@@ -1,3 +1,5 @@
+FIREFOX_DRIVER_PATH = r'D:\\downloads\\software\\geckodriver-v0.27.0-win64\\geckodriver.exe'
+
 # the id of the auction i.e. the last parameter of the URL
 # https://scrap.tf/auctions/auction_id
 # it appears that the id is always a 6 digit combo of upper case letters and numbers
