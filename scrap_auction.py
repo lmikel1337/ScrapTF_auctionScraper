@@ -9,8 +9,7 @@ import utils
 
 # get's raw html, which later will be scraped
 def get_html():
-    auction = config.auction_id
-    url = "https://scrap.tf/auctions/" + auction
+    url = "https://scrap.tf/auctions/" + config.auction_id
 
     page = requests.get(url)
     soup = BeautifulSoup(page.content, 'html.parser')

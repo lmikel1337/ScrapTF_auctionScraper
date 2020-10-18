@@ -1,6 +1,7 @@
 import backpacktf_scraper
 import scrap_auction
 import utils
+import raffle_joiner
 
 
 # this is where the magic happens
@@ -53,6 +54,8 @@ def start():
             utils.set_auction_id_from_user()
         elif user_input == 7:
             save_params(items)
+        elif user_input == 8:
+            raffle_joiner.join_raffles()
 
 
 def browse_mode():
@@ -145,3 +148,4 @@ def show_menu():
     print('5: update the bid')
     print('6: change AUC_ID')
     print('7: save auction data')
+    print('8: join all raffles')
