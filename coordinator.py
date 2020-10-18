@@ -56,13 +56,13 @@ def start():
 
 
 def browse_mode():
-    print("Enter 0 to exit the browsing mode")
+    print("Type 0 to exit the browsing mode")
     for j in range(1, 100):
+        items = get_items()
+        display_bptf(items)
         res = utils.set_auction_id_from_user()
         if res == 1:
             break
-        items = get_items()
-        display_bptf(items)
 
 
 def save_params(items):
@@ -105,17 +105,17 @@ def display_bptf(items_to_scrape):
     stats = backpacktf_scraper.get_stats(items_to_scrape)
     print('\n________________________________________')
     print('Links:')
-    print('________________________________________')
+    # print('________________________________________')
     for stat_instance in stats:
         print('Item\'s URL: {0}'.format(stat_instance["item_url"]))
         if stat_instance["paint_url"] is not None:
-            print('paint: {0}\nURL: {1}'.format(items_to_scrape[stats.index(stat_instance)]["paint"], stat_instance["paint_url"]))
+            print('paint: {0}\nURL: {1}:'.format(items_to_scrape[stats.index(stat_instance)]["paint"], stat_instance["paint_url"]))
         if stat_instance["spells_url"] is not None:
             for spell in stat_instance["spells_url"]:
-                print('spell: {0}\nURL: {1}'.format(items_to_scrape[stats.index(stat_instance)]["spell(s)"], spell))
+                print('spell: {0}\nURL: {1}:'.format(items_to_scrape[stats.index(stat_instance)]["spell(s)"][stat_instance['spells_url'].index(spell)], spell))
         if stat_instance["parts_url"] is not None:
             for part in stat_instance["parts_url"]:
-                print('part: {0}\nURL: {1}'.format(items_to_scrape[stats.index(stat_instance)]["part(s)"], part))
+                print('part: {0}\nURL: {1}:'.format(items_to_scrape[stats.index(stat_instance)]["part(s)"][stat_instance['parts_url'].index(part)], part))
         print('________________________________________')
 
 
@@ -145,4 +145,3 @@ def show_menu():
     print('5: update the bid')
     print('6: change AUC_ID')
     print('7: save auction data')
-
