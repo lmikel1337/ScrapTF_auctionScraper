@@ -2,30 +2,22 @@ import backpacktf_scraper
 import scrap_auction
 import utils
 import raffle_joiner
+import config
 
 
 # this is where the magic happens
 def start():
-    utils.set_auction_id_from_user()
 
     show_menu()
-
-    # gets the auction items
-    items = get_items()
-
-    # states whether the scrap.tf auction need to be scraped again
-    need_to_get_items = False
 
     # the main loop, note that it will break after 100 user inputs(including incorrect inputs)
     # a do-while loop is not implemented in Python and this is the next best solution I could find
     for i in range(0, 100):
 
         # scraping the auction if necessary
-        if need_to_get_items:
-            items = get_items()
+        # if need_to_get_items:
             # sets the bool to False so that the auction won't get scraped each iteration
-            need_to_get_items = False
-        user_input = input("Enter: ")
+        user_input = input(" ")
 
         # attempts to cast the user_input to an int, raises an exception if not successful
         try:
@@ -33,6 +25,15 @@ def start():
         except Exception:
             print("invalid type")
             continue
+        if user_input in range(1, 6):
+            if config.auction_id == '':
+                utils.set_auction_id_from_user()
+            need_to_get_items = True
+        else:
+            need_to_get_items = False
+        if need_to_get_items:
+            items = get_items()
+            need_to_get_items = False
 
         # case block wannabe
         if user_input == 0:
@@ -55,7 +56,11 @@ def start():
         elif user_input == 7:
             save_params(items)
         elif user_input == 8:
-            raffle_joiner.join_raffles()
+            user_input = input('join all raffles once(press 1) or every 60 min(press 2): ')
+            if user_input == '1':
+                raffle_joiner.join_raffles(mode='one_time')
+            elif user_input == '2':
+                raffle_joiner.join_raffles(mode='loop')
 
 
 def browse_mode():
