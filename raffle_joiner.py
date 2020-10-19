@@ -74,10 +74,9 @@ def join_raffles(mode='one_time', loop_delay=60):
     elif mode == 'loop':
         iter_count = 100
 
-    total_joined_raffles_counter = 0
-    joined_raffles_in_cycle_counter = 0
-
     for i in range(0, iter_count):
+        joined_raffles_in_cycle_counter = 0
+
         raffle_ids = get_raffle_ids(driver)
         print(f'raffle_ids: {raffle_ids}')
         print(f'Active raffles: {format(len(raffle_ids))}')
@@ -103,11 +102,11 @@ def join_raffles(mode='one_time', loop_delay=60):
 
             time.sleep(2)
         print('______________________________________')
-        print(f'Joined {joined_raffles_in_cycle_counter - total_joined_raffles_counter} raffles')
-        total_joined_raffles_counter += joined_raffles_in_cycle_counter
+        print(f'Joined {joined_raffles_in_cycle_counter} raffles in cycle No.{i+1}')
         print(f'Time elapsed: {datetime.datetime.now() - timer_start}')
         print(f'timestamp: {datetime.datetime.now().strftime("%H:%M:%S")}')
         if mode == 'loop':
-            print(f'next joining scheduled for {(datetime.datetime.now() + datetime.timedelta(minutes = loop_delay)).strftime("%H:%M:%S")}')
+            print(
+                f'next joining scheduled for {(datetime.datetime.now() + datetime.timedelta(minutes = loop_delay)).strftime("%H:%M:%S")}')
             time.sleep(loop_delay * 60)
     driver.quit()
