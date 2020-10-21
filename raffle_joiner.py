@@ -19,8 +19,7 @@ def get_raffle_ids(browser_driver):
     for div in html:
         if 'class="raffle-name"' in div:
             raffle_id = re.search('href="/raffles/(.*)">', div).group(1)
-            if len(raffle_id) == 6:
-                raffles_ids.append(raffle_id)
+            raffles_ids.append(raffle_id[0:6])
     print('raffle ids acquired')
     return raffles_ids
 
@@ -70,7 +69,7 @@ def join_raffles(mode='one_time', loop_delay=60):
     driver = login()
 
     if mode == 'one_time':
-        iter_count = 0
+        iter_count = 1
     elif mode == 'loop':
         iter_count = 100
 
@@ -100,7 +99,7 @@ def join_raffles(mode='one_time', loop_delay=60):
                 joined_raffles_in_cycle_counter += 1
                 print(f"raffle {raffle_id} joined")
 
-            time.sleep(2)
+            time.sleep(3)
         print('______________________________________')
         print(f'Joined {joined_raffles_in_cycle_counter} raffles in cycle No.{i+1}')
         print(f'Time elapsed: {datetime.datetime.now() - timer_start}')
