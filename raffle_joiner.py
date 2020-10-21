@@ -99,7 +99,7 @@ def join_raffles(mode='one_time', loop_delay=60):
                 joined_raffles_in_cycle_counter += 1
                 print(f"raffle {raffle_id} joined")
 
-            time.sleep(2)
+            time.sleep(3)
         print('______________________________________')
         print(f'Joined {joined_raffles_in_cycle_counter} raffles in cycle No.{i+1}')
         print(f'Time elapsed: {datetime.datetime.now() - timer_start}')
