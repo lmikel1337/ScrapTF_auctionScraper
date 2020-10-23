@@ -7,7 +7,7 @@ import config
 
 # this is where the magic happens
 def start():
-
+    print(f'version {config.project_version}\n')
     show_menu()
 
     # the main loop, note that it will break after 100 user inputs(including incorrect inputs)
@@ -17,7 +17,7 @@ def start():
         # scraping the auction if necessary
         # if need_to_get_items:
             # sets the bool to False so that the auction won't get scraped each iteration
-        user_input = input(" ")
+        user_input = input()
 
         # attempts to cast the user_input to an int, raises an exception if not successful
         try:
