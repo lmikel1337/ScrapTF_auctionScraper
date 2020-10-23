@@ -75,9 +75,6 @@ def join_raffles(mode='one_time', loop_delay=10):
     elif mode == 'loop':
         iter_count = 100
 
-    # scheduled_start_time = datetime.datetime.now() - datetime.timedelta(minutes=1)
-    # start_scraping_delay = 300
-
     total_raffles_joined_in_session = 0
 
     for i in range(0, iter_count):
@@ -87,58 +84,50 @@ def join_raffles(mode='one_time', loop_delay=10):
         if not raffle_ids:
             print(f'No new raffles found\nnext check in {loop_delay} min({(datetime.datetime.now() + datetime.timedelta(minutes=loop_delay)).strftime("%H:%M:%S")})')
             time.sleep(loop_delay * 60)
-            break
-        print(f'found {len(raffle_ids)} new raffles')
+        else:
+            print(f'found {len(raffle_ids)} new raffles')
 
-        # while datetime.datetime.now() <= scheduled_start_time + datetime.timedelta(minutes=1):
-        #     print('I SHLEEP')
-        #     time.sleep(start_scraping_delay)
+            joined_raffles_in_cycle_counter = 0
 
-        joined_raffles_in_cycle_counter = 0
+            print(f'Total active raffles: {format(len(raffle_ids))}')
+            print('started the process of joining the raffles...')
+            print('______________________________________')
 
-        # print(f'raffle_ids: {raffle_ids}')
-        print(f'Total active raffles: {format(len(raffle_ids))}')
-        print('started the process of joining the raffles...')
-        print('______________________________________')
+            timer_start = datetime.datetime.now()
 
-        timer_start = datetime.datetime.now()
+            for raffle_id in raffle_ids:
 
-        for raffle_id in raffle_ids:
+                raffle_index = raffle_ids.index(raffle_id) + 1
+                print(f"{raffle_index}. opening raffle {raffle_id}")
 
-            raffle_index = raffle_ids.index(raffle_id) + 1
-            print(f"{raffle_index}. opening raffle {raffle_id}")
+                driver.get("https://scrap.tf/raffles/{0}".format(raffle_id))
 
-            driver.get("https://scrap.tf/raffles/{0}".format(raffle_id))
-
-            joined = False
-            try:
-                button = driver.find_element_by_xpath('/html/body/div[6]/div/div[3]/div[5]/div[2]/button[2]')
-                joined = True
-            except Exception:
+                joined = False
                 try:
-                    button = driver.find_element_by_xpath('/html/body/div[6]/div/div[3]/div[7]/div[2]/button[2]')
+                    button = driver.find_element_by_xpath('/html/body/div[6]/div/div[3]/div[5]/div[2]/button[2]')
                     joined = True
                 except Exception:
-                    print('Raffle already joined...\nRaffle joining process stopped...')
-                    # print_summary(mode, scheduled_start_time, joined_raffles_in_cycle_counter, timer_start, i)
-                    break
-            if joined:
-                button.click()
-                joined_raffles_in_cycle_counter += 1
-                print(f"raffle {raffle_id} joined")
+                    try:
+                        button = driver.find_element_by_xpath('/html/body/div[6]/div/div[3]/div[7]/div[2]/button[2]')
+                        joined = True
+                    except Exception:
+                        print('Raffle already joined...\nRaffle joining process stopped...')
+                        # print_summary(mode, scheduled_start_time, joined_raffles_in_cycle_counter, timer_start, i)
+                        break
+                if joined:
+                    button.click()
+                    joined_raffles_in_cycle_counter += 1
+                    print(f"raffle {raffle_id} joined")
 
-            time.sleep(3)
+                time.sleep(3)
 
         total_raffles_joined_in_session += joined_raffles_in_cycle_counter
-        timer_end = datetime.datetime.now()
 
-        # scheduled_start_time = timer_end + datetime.timedelta(minutes=loop_delay)
-
-        print_summary(mode, total_raffles_joined_in_session, joined_raffles_in_cycle_counter, timer_start, i)
+        print_summary(total_raffles_joined_in_session, joined_raffles_in_cycle_counter, timer_start, i)
     driver.quit()
 
 
-def print_summary(mode, total_raffles_joined_in_session, joined_raffles_in_cycle_counter, timer_start, cycle_index):
+def print_summary(total_raffles_joined_in_session, joined_raffles_in_cycle_counter, timer_start, cycle_index):
     print('______________________________________')
     print(f'timestamp: {datetime.datetime.now().strftime("%H:%M:%S")}')
     print(f'total raffle joined: {total_raffles_joined_in_session}')
