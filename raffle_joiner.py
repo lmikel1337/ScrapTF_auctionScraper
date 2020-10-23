@@ -133,5 +133,6 @@ def print_summary(total_raffles_joined_in_session, joined_raffles_in_cycle_count
     print(f'Cycle number: {cycle_index+1}')
     print(f'Total raffles joined: {total_raffles_joined_in_session}')
     print(f'Joined raffles in current cycle: {joined_raffles_in_cycle_counter}')
-    print(f'Cycle work time: {(datetime.datetime.now() - timer_start).strftime("%H:%M:%S")}')
+
+    print(f'Cycle work time: {datetime.datetime.now()}')
     print('______________________________________')
