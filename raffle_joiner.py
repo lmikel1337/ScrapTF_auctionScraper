@@ -130,8 +130,8 @@ def join_raffles(mode='one_time', loop_delay=10):
 def print_summary(total_raffles_joined_in_session, joined_raffles_in_cycle_counter, timer_start, cycle_index):
     print('______________________________________')
     print(f'timestamp: {datetime.datetime.now().strftime("%H:%M:%S")}')
-    print(f'total raffle joined: {total_raffles_joined_in_session}')
-    print(f'Cycle: {cycle_index+1}')
+    print(f'Cycle number: {cycle_index+1}')
+    print(f'Total raffles joined: {total_raffles_joined_in_session}')
     print(f'Joined raffles in current cycle: {joined_raffles_in_cycle_counter}')
-    print(f'Cycle work time: {datetime.datetime.now() - timer_start}')
+    print(f'Cycle work time: {(datetime.datetime.now() - timer_start).strftime("%H:%M:%S")}')
     print('______________________________________')
