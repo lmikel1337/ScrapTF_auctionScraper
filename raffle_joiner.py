@@ -76,8 +76,10 @@ def join_raffles(mode='one_time', loop_delay=10):
         iter_count = 100
 
     total_raffles_joined_in_session = 0
+    joined_raffles_in_cycle_counter = 0
 
     for i in range(0, iter_count):
+        timer_start = datetime.datetime.now()
 
         print('Checking for new raffles...')
         raffle_ids = get_raffle_ids(driver)
@@ -87,13 +89,10 @@ def join_raffles(mode='one_time', loop_delay=10):
         else:
             print(f'found {len(raffle_ids)} new raffles')
 
-            joined_raffles_in_cycle_counter = 0
-
             print(f'Total active raffles: {format(len(raffle_ids))}')
             print('started the process of joining the raffles...')
             print('______________________________________')
 
-            timer_start = datetime.datetime.now()
 
             for raffle_id in raffle_ids:
 
@@ -133,6 +132,5 @@ def print_summary(total_raffles_joined_in_session, joined_raffles_in_cycle_count
     print(f'Cycle number: {cycle_index+1}')
     print(f'Total raffles joined: {total_raffles_joined_in_session}')
     print(f'Joined raffles in current cycle: {joined_raffles_in_cycle_counter}')
-
     print(f'Cycle work time: {datetime.datetime.now()}')
     print('______________________________________')
