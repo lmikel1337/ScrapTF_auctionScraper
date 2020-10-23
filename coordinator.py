@@ -7,7 +7,7 @@ import config
 
 # this is where the magic happens
 def start():
-
+    print(f'version {config.version}\n')
     show_menu()
 
     # the main loop, note that it will break after 100 user inputs(including incorrect inputs)
