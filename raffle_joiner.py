@@ -76,10 +76,11 @@ def join_raffles(mode='one_time', loop_delay=10):
         iter_count = 100
 
     total_raffles_joined_in_session = 0
-    joined_raffles_in_cycle_counter = 0
 
     for i in range(0, iter_count):
         timer_start = datetime.datetime.now()
+
+        joined_raffles_in_cycle_counter = 0
 
         print('Checking for new raffles...')
         raffle_ids = get_raffle_ids(driver)
