@@ -1,6 +1,6 @@
 FIREFOX_DRIVER_PATH = r'D:\\downloads\\software\\geckodriver-v0.27.0-win64\\geckodriver.exe'
 
-project_version = '0.5.2'
+project_version = '0.5.5'
 
 # the id of the auction i.e. the last parameter of the URL
 # https://scrap.tf/auctions/auction_id
@@ -206,3 +206,4 @@ particles_dict = {
     "Twisted Radiance": 130,
     "White Lightning": 119,
 }
+
