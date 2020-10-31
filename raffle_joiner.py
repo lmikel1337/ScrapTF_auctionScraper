@@ -73,7 +73,7 @@ def join_raffles(mode='one_time', loop_delay=10):
     if mode == 'one_time':
         iter_count = 1
     elif mode == 'loop':
-        iter_count = 100
+        iter_count = 999999
 
     total_raffles_joined_in_session = 0
 
@@ -93,7 +93,6 @@ def join_raffles(mode='one_time', loop_delay=10):
             print(f'Total active raffles: {format(len(raffle_ids))}')
             print('started the process of joining the raffles...')
             print('______________________________________')
-
 
             for raffle_id in raffle_ids:
 

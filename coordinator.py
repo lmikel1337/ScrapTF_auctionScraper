@@ -1,8 +1,9 @@
-import backpacktf_scraper
+import backpacktf_url_gen
 import scrap_auction
 import utils
 import raffle_joiner
 import config
+import webbrowser
 
 
 # this is where the magic happens
@@ -65,9 +66,15 @@ def start():
 
 def browse_mode():
     print("Type 0 to exit the browsing mode")
+    user_input = input('Would you like to have the item classifieds opened in browser(1) '
+                       '\nor to have the bot show you the links(2): ')
+
     for j in range(1, 100):
         items = get_items()
-        display_bptf(items)
+        if user_input == '1':
+            display_bptf(items, mode='open_main_links')
+        if user_input == '2':
+            display_bptf(items, mode='show_url_only')
         res = utils.set_auction_id_from_user()
         if res == 1:
             break
@@ -78,12 +85,12 @@ def save_params(items):
     flag = input('Enter param: ')
     if '-all' in flag:
         bid, bid_type = get_bids()
-        utils.save_auction_info(items, backpacktf_scraper.get_stats(items), bid, bid_type)
+        utils.save_auction_info(items, backpacktf_url_gen.get_stats(items), bid, bid_type)
     elif '-scrap' in flag:
         bid, bid_type = get_bids()
         utils.save_auction_info(items, bid, bid_type)
     elif '-bptf' in flag:
-        utils.save_auction_info(backpacktf_scraper.get_stats(items))
+        utils.save_auction_info(backpacktf_url_gen.get_stats(items))
     else:
         pass
 
@@ -109,12 +116,13 @@ def display_bid():
 
 # displays the links to bp.tf classifieds listings of the auctioned items and their relevant
 # properties(paint, spell(s), strange part(s))
-def display_bptf(items_to_scrape):
-    stats = backpacktf_scraper.get_stats(items_to_scrape)
+def display_bptf(items_to_scrape, mode='open_main_links'):
+    stats = backpacktf_url_gen.get_stats(items_to_scrape)
     print('\n________________________________________')
     print('Links:')
-    # print('________________________________________')
     for stat_instance in stats:
+        if mode == 'open_main_links':
+            webbrowser.open(stat_instance["item_url"])
         print(f'Item: {items_to_scrape[stats.index(stat_instance)]["name"]}\nURL: {stat_instance["item_url"]}')
         if stat_instance["paint_url"] is not None:
             print('paint: {0}\nURL: {1}:'.format(items_to_scrape[stats.index(stat_instance)]["paint"], stat_instance["paint_url"]))
