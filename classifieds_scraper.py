@@ -66,13 +66,11 @@ def get_listings(browser_driver, url, key_price):
         price = re.search('data-listing_price="(.*)"', line)
         if price:
             price = price.group(1).split('"')[0].replace(' keys', '').replace(' ref', '').replace(' ', '')
-            # print(type(price))
-            # print(f'price: {price}')
             price = convert_currency(price, key_price)
-        if price == '':
-            price = re.search('data-listing_mp_price="(.*)"', line)
-            if price:
-                price = price.group(1).split('"')[0]
+        # if price == '':
+        #     price = re.search('data-listing_mp_price="(.*)"', line)
+        #     if price:
+        #         price = price.group(1).split('"')[0]
         intent = re.search('listing-intent-(.*)">', line)
         if intent:
             if intent.group(1) == 'buy':
@@ -101,19 +99,23 @@ def get_current_key_price(browser_driver, param='metal'):
                     price = re.search('data-p_bptf_all="(.*)"', line)
 
                 if price:
-                    current_key_val = price.group(1).split('"')[0].replace(' keys', '').replace(' ref', '').replace(' ', '').replace('$', '')
+                    current_key_val = price.group(1).split('"')[0].replace(' keys', '').replace(' ref', '').replace(' ', '').replace('$', '').replace('key', '')
 
                     return current_key_val
 
 
 def convert_currency(currency_val_to_convert, current_key_price):
-    if '$' in currency_val_to_convert:
-        currency_val_to_convert = currency_val_to_convert.replace('$', '')
-        currency_val_to_convert = float(currency_val_to_convert) / float(current_key_price[1])
-        return round(currency_val_to_convert, 2)
-    elif ',' not in currency_val_to_convert:
-        return float(currency_val_to_convert)
-    else:
+    if currency_val_to_convert is not '' and currency_val_to_convert is not None:
+        if '–' in currency_val_to_convert:
+            currency_val_to_convert = currency_val_to_convert.split('–')[0]
+            # return float(currency_val_to_convert)
+        if '$' in currency_val_to_convert:
+            currency_val_to_convert = currency_val_to_convert.replace('$', '')
+            currency_val_to_convert = float(currency_val_to_convert) / float(current_key_price[1])
+            return round(currency_val_to_convert, 2)
+        if ',' not in currency_val_to_convert:
+            return float(currency_val_to_convert)
+
         currency_val_to_convert = currency_val_to_convert.split(',')
         currency_val_to_convert[0] = float(currency_val_to_convert[0])
         currency_val_to_convert[1] = float(currency_val_to_convert[1])
@@ -125,16 +127,28 @@ def convert_currency(currency_val_to_convert, current_key_price):
 def kowalski_analyze(
         browser_driver, item_name, item_info, buy_orders, sell_orders, classified_url, current_key_price):
     item_info[1] = convert_currency(item_info[1], current_key_price)
-    print(item_name)
-    print(f'url: {classified_url}')
-    print(f'bo_count: {buy_orders[1]}\nbo_prices: {buy_orders[0]}')
-    print(f'bp price: {item_info[1]}')
+
+    quickbuy_coefficient = -1
 
     if buy_orders[0] is not None and item_info[1] is not None:
         traders_coefficient = buy_orders[0][0] / float(item_info[1])
     else:
         traders_coefficient = -1
-    print(f'traders_coefficient: {traders_coefficient}')
+    if not sell_orders[0]:
+        sell_orders[0] == 0
+    if sell_orders[0] and buy_orders[0] and sell_orders[0] is not None and len(sell_orders[0]) != 0:
+        # print(f'sell_orders[0]: {sell_orders[0]}')
+        # print(f'buy_orders[0]: {buy_orders[0]}')
+        if sell_orders[0][0] is not None and sell_orders[0][0]:
+            quickbuy_coefficient = buy_orders[0][0] / sell_orders[0][0]
+
+    if quickbuy_coefficient >= 1:
+        print(item_name)
+        print(f'url: {classified_url}')
+        print(f'bo_count: {buy_orders[1]}\nbo_prices: {buy_orders[0]}')
+        print(f'bp price: {item_info[1]}')
+        print(f'quickbuy_coefficient: {quickbuy_coefficient}')
+        print(f'traders_coefficient: {traders_coefficient}')
 
 
 def scrape_unusuals(browser_driver, list_of_items):
