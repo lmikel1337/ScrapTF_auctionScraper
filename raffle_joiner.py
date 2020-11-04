@@ -103,16 +103,28 @@ def join_raffles(mode='one_time', loop_delay=10):
 
                 joined = False
                 try:
-                    button = driver.find_element_by_xpath('/html/body/div[6]/div/div[3]/div[5]/div[2]/button[2]')
+                    button = driver.find_element_by_xpath(
+                        '/html/body/div[6]/div/div[3]/div[5]/div[2]/button[2]')
                     joined = True
                 except Exception:
                     try:
-                        button = driver.find_element_by_xpath('/html/body/div[6]/div/div[3]/div[7]/div[2]/button[2]')
+                        button = driver.find_element_by_xpath(
+                            '/html/body/div[6]/div/div[3]/div[7]/div[2]/button[2]')
                         joined = True
                     except Exception:
-                        print('Raffle already joined...\nRaffle joining process stopped...')
-                        # print_summary(mode, scheduled_start_time, joined_raffles_in_cycle_counter, timer_start, i)
-                        break
+                        try:
+                            button = driver.find_element_by_xpath(
+                                '/html/body/div[4]/div/div[3]/div[5]/div[2]/button[2]')
+                            joined = True
+                        except Exception:
+                            try:
+                                button = driver.find_element_by_xpath(
+                                    '/html/body/div[5]/div/div[3]/div[7]/div[2]/button[2]')
+                                joined = True
+                            except Exception:
+                                print('Raffle already joined...\nRaffle joining process stopped...')
+                                # print_summary(mode, scheduled_start_time, joined_raffles_in_cycle_counter, timer_start, i)
+                                break
                 if joined:
                     button.click()
                     joined_raffles_in_cycle_counter += 1
@@ -124,6 +136,7 @@ def join_raffles(mode='one_time', loop_delay=10):
 
         print_summary(total_raffles_joined_in_session, joined_raffles_in_cycle_counter, timer_start, i)
     driver.quit()
+# /html/body/div[5]/div/div[3]/div[7]/div[2]/button[2]
 
 
 def print_summary(total_raffles_joined_in_session, joined_raffles_in_cycle_counter, timer_start, cycle_index):
