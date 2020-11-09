@@ -93,3 +93,10 @@ def save_auction_info(items, stats, bid, bid_type):
 def write_dict(file, dictionary):
     for el in dictionary:
         file.write(str(el) + ": " + str(dictionary[el]) + '\n')
+
+
+def get_key(dictionary, searched_val):
+    for key, value in dictionary.items():
+        if value == searched_val:
+            return key
+    return 'key doesn\'t exist'
