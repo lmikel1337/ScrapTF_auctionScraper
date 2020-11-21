@@ -1,4 +1,6 @@
 import datetime
+import re
+from bs4 import BeautifulSoup
 
 import config
 
@@ -100,3 +102,46 @@ def get_key(dictionary, searched_val):
         if value == searched_val:
             return key
     return 'key doesn\'t exist'
+
+
+def convert_currency(currency_val_to_convert, current_key_price):
+    if isinstance(currency_val_to_convert, float):
+        return currency_val_to_convert
+    if currency_val_to_convert is not '' and currency_val_to_convert is not None:
+        if '–' in currency_val_to_convert:
+            currency_val_to_convert = currency_val_to_convert.split('–')[0]
+        if '$' in currency_val_to_convert:
+            currency_val_to_convert = currency_val_to_convert.replace('$', '')
+            currency_val_to_convert = float(currency_val_to_convert) / float(current_key_price[1])
+            return round(currency_val_to_convert, 2)
+        if ',' not in currency_val_to_convert:
+            return float(currency_val_to_convert)
+
+        currency_val_to_convert = currency_val_to_convert.split(',')
+        currency_val_to_convert[0] = float(currency_val_to_convert[0])
+        currency_val_to_convert[1] = float(currency_val_to_convert[1])
+
+        currency_val_to_convert[1] = currency_val_to_convert[1] / float(current_key_price[0])
+        return round(currency_val_to_convert[0] + currency_val_to_convert[1], 2)
+
+
+def get_current_key_price(browser_driver, param='metal'):
+    browser_driver.get('https://backpack.tf/stats/Unique/Mann%20Co.%20Supply%20Crate%20Key/Tradable/Craftable')
+    souped_html = BeautifulSoup(browser_driver.page_source, 'html.parser')
+    classifieds = souped_html.findAll("li", {"class": "listing"})
+    html_lines = []
+    for item in classifieds:
+        html_lines.append(str(item))
+    for line in html_lines:
+        intent = re.search('listing-intent-(.*)">', line)
+        if intent:
+            if intent.group(1) == 'buy':
+                if param == 'metal':
+                    price = re.search('data-listing_price="(.*)"', line)
+                elif param == 'usd':
+                    price = re.search('data-p_bptf_all="(.*)"', line)
+
+                if price:
+                    current_key_val = price.group(1).split('"')[0].replace(' keys', '').replace(' ref', '').replace(' ','').replace('$', '')
+
+                    return current_key_val
