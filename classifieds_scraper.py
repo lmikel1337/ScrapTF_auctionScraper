@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 import config
 import utils
 
+
 def create_url(item_name, param, particle_id=None):
     item_name = item_name.replace(' ', '%20').replace(':', '%3A')
     if param == 'unusual':
@@ -35,7 +36,7 @@ def get_effects_info(browser_driver, unusuals_name, price_limits, current_key_pr
             price = re.search('data-p_bptf="(.*) keys" data', line)
             if price:
                 price = price.group(1).split('"')[0].replace(' keys', '').replace(' ref', '').replace(' ', '').replace('key', '')
-                price = convert_currency(price, current_key_price)
+                price = utils.convert_currency(price, current_key_price)
                 if price_limits[0] <= price <= price_limits[1]:
                     bp_prices.append(price)
                     if num_in_existence:
@@ -69,7 +70,7 @@ def get_listings(browser_driver, url, key_price):
         price = re.search('data-listing_price="(.*)"', line)
         if price:
             price = price.group(1).split('"')[0].replace(' keys', '').replace(' ref', '').replace(' ', '').replace('key', '')
-            price = convert_currency(price, key_price)
+            price = utils.convert_currency(price, key_price)
         intent = re.search('listing-intent-(.*)">', line)
         if intent:
             if intent.group(1) == 'buy':
@@ -81,49 +82,6 @@ def get_listings(browser_driver, url, key_price):
     return bo_prices, so_prices, bo_listings_counter, so_listings_counter
 
 
-def get_current_key_price(browser_driver, param='metal'):
-    browser_driver.get('https://backpack.tf/stats/Unique/Mann%20Co.%20Supply%20Crate%20Key/Tradable/Craftable')
-    souped_html = BeautifulSoup(browser_driver.page_source, 'html.parser')
-    classifieds = souped_html.findAll("li", {"class": "listing"})
-    html_lines = []
-    for item in classifieds:
-        html_lines.append(str(item))
-    for line in html_lines:
-        intent = re.search('listing-intent-(.*)">', line)
-        if intent:
-            if intent.group(1) == 'buy':
-                if param == 'metal':
-                    price = re.search('data-listing_price="(.*)"', line)
-                elif param == 'usd':
-                    price = re.search('data-p_bptf_all="(.*)"', line)
-
-                if price:
-                    current_key_val = price.group(1).split('"')[0].replace(' keys', '').replace(' ref', '').replace(' ','').replace('$', '')
-
-                    return current_key_val
-
-
-def convert_currency(currency_val_to_convert, current_key_price):
-    if isinstance(currency_val_to_convert, float):
-        return currency_val_to_convert
-    if currency_val_to_convert is not '' and currency_val_to_convert is not None:
-        if '–' in currency_val_to_convert:
-            currency_val_to_convert = currency_val_to_convert.split('–')[0]
-        if '$' in currency_val_to_convert:
-            currency_val_to_convert = currency_val_to_convert.replace('$', '')
-            currency_val_to_convert = float(currency_val_to_convert) / float(current_key_price[1])
-            return round(currency_val_to_convert, 2)
-        if ',' not in currency_val_to_convert:
-            return float(currency_val_to_convert)
-
-        currency_val_to_convert = currency_val_to_convert.split(',')
-        currency_val_to_convert[0] = float(currency_val_to_convert[0])
-        currency_val_to_convert[1] = float(currency_val_to_convert[1])
-
-        currency_val_to_convert[1] = currency_val_to_convert[1] / float(current_key_price[0])
-        return round(currency_val_to_convert[0] + currency_val_to_convert[1], 2)
-
-
 def kowalski_analyze(
         browser_driver,
         item_name,
@@ -133,7 +91,7 @@ def kowalski_analyze(
         classified_url,
         current_key_price,
         particle_effect):
-    item_info[1] = convert_currency(item_info[1], current_key_price)
+    item_info[1] = utils.convert_currency(item_info[1], current_key_price)
 
     quickbuy_coefficient = -1
     so_ratio = -1
@@ -169,7 +127,7 @@ def kowalski_analyze(
 
 
 def scrape_unusuals(browser_driver, list_of_items, price_limits):
-    current_key_price = [get_current_key_price(browser_driver), get_current_key_price(browser_driver, param='usd')]
+    current_key_price = [utils.get_current_key_price(browser_driver), utils.get_current_key_price(browser_driver, param='usd')]
     for item in reversed(list_of_items):
         item_effects = get_effects_info(browser_driver, item, price_limits, current_key_price)
         for i in range(0, len(item_effects['unusual_effect_ids'])):
@@ -195,7 +153,8 @@ def scrape_unusuals(browser_driver, list_of_items, price_limits):
 def get_item_lists(browser_driver, search_mode, ignore_taunts):
     if search_mode == 'unusual_hats_taunts':
         browser_driver.get('https://backpack.tf/unusuals')
-
+    elif search_mode == 'primary':
+        browser_driver.get('https://backpack.tf/category/slot/primary')
         html = browser_driver.page_source.split('</div>')
         items = []
         for line in html:
@@ -241,6 +200,15 @@ def scrape_coordinator(mode='unusual_hats_taunts', ignore_taunts=False, price_li
     if 'unusual' in mode:
         unusuals = get_item_lists(driver, mode, ignore_taunts)
         scrape_unusuals(driver, unusuals, price_limits)
+    elif 'low_tier' in mode:
+        miscs = []
+        taunts = []
+        primary = get_item_lists(driver, search_mode='primary', ignore_taunts=ignore_taunts)
+        secondary = []
+        melee = []
+        pda_2 = []
+        building = []
 
 
-scrape_coordinator(mode='unusual_hats_taunts', ignore_taunts=True, price_limits=[11, 20])
+scrape_coordinator(mode='low_tier', ignore_taunts=True)
+# scrape_coordinator(mode='unusual_hats_taunts', ignore_taunts=True, price_limits=[11, 20])

@@ -1,6 +1,7 @@
 import time
 import datetime
 from selenium import webdriver
+from bs4 import BeautifulSoup
 
 import re
 
@@ -57,6 +58,39 @@ def get_driver(driver_type='firefox'):
     return driver
 
 
+def get_raffled_items(souped_html):
+    items_html = str(souped_html.findAll("div", {"class": "items-container"})).split('</div>')
+    fin_items = []
+    for item_html in items_html:
+
+        quality = re.search('item hoverable (.*) ', item_html)
+        slot = re.search('data-slot="(.*)" ', item_html)
+
+        if quality:
+            quality = quality.group(1).split(' ')[0]
+        else:
+            quality = None
+        if slot:
+            slot = slot.group(1).split(' ')[0].replace('\'', '').replace('"', '').replace(' ', '')
+        else:
+            slot = None
+        fin_items.append([slot, quality])
+
+    return fin_items
+
+
+def join_raffle_decider(souped_html):
+    raffle_items = get_raffled_items(souped_html)
+    should_join = False
+    for raffle_item in raffle_items:
+        if raffle_item[0] not in config.join_raffle_decider_blacklist_slot and raffle_item[0] is not None:
+            should_join = True
+        else:
+            if raffle_item[1] not in config.join_raffle_decider_blacklist_quality and raffle_item[1] is not None:
+                should_join = True
+    return should_join
+
+
 def login():
     print('started login process...')
     driver = get_driver(driver_type='Firefox')
@@ -76,6 +110,7 @@ def join_raffles(mode='one_time', loop_delay=10):
         iter_count = 999999
 
     total_raffles_joined_in_session = 0
+    raffle_id_blacklist = []
 
     for i in range(0, iter_count):
         timer_start = datetime.datetime.now()
@@ -84,6 +119,16 @@ def join_raffles(mode='one_time', loop_delay=10):
 
         print('Checking for new raffles...')
         raffle_ids = get_raffle_ids(driver)
+        print(type(raffle_ids))
+        print(f'raffle_ids {raffle_ids}')
+        for id in raffle_ids:
+            if id in raffle_id_blacklist:
+                print(f'removed {id}')
+                try:
+                    raffle_ids = raffle_ids.remove(id)
+                except:
+                    pass
+
         if not raffle_ids:
             print(f'No new raffles found\nnext check in {loop_delay} min({(datetime.datetime.now() + datetime.timedelta(minutes=loop_delay)).strftime("%H:%M:%S")})')
             time.sleep(loop_delay * 60)
@@ -95,40 +140,34 @@ def join_raffles(mode='one_time', loop_delay=10):
             print('______________________________________')
 
             for raffle_id in raffle_ids:
-
                 raffle_index = raffle_ids.index(raffle_id) + 1
                 print(f"{raffle_index}. opening raffle {raffle_id}")
+                url = "https://scrap.tf/raffles/{0}".format(raffle_id)
+                driver.get(url)
+                souped_html = BeautifulSoup(driver.page_source, 'html.parser')
 
-                driver.get("https://scrap.tf/raffles/{0}".format(raffle_id))
-
-                joined = False
-                try:
-                    button = driver.find_element_by_xpath(
-                        '/html/body/div[6]/div/div[3]/div[5]/div[2]/button[2]')
-                    joined = True
-                except Exception:
+                button_found = False
+                for xpath in config.scraptf_raffle_join_button_xpaths:
                     try:
-                        button = driver.find_element_by_xpath(
-                            '/html/body/div[6]/div/div[3]/div[7]/div[2]/button[2]')
-                        joined = True
+                        button = driver.find_element_by_xpath(xpath)
+                        button_found = True
+                        break
                     except Exception:
-                        try:
-                            button = driver.find_element_by_xpath(
-                                '/html/body/div[4]/div/div[3]/div[5]/div[2]/button[2]')
-                            joined = True
-                        except Exception:
-                            try:
-                                button = driver.find_element_by_xpath(
-                                    '/html/body/div[5]/div/div[3]/div[7]/div[2]/button[2]')
-                                joined = True
-                            except Exception:
-                                print('Raffle already joined...\nRaffle joining process stopped...')
-                                # print_summary(mode, scheduled_start_time, joined_raffles_in_cycle_counter, timer_start, i)
-                                break
-                if joined:
-                    button.click()
-                    joined_raffles_in_cycle_counter += 1
-                    print(f"raffle {raffle_id} joined")
+                        button_found = False
+                        # print('Raffle already button_found...\nRaffle joining process stopped...')
+                        # print_summary(mode, scheduled_start_time, joined_raffles_in_cycle_counter, timer_start, i)
+                if button_found:
+                    should_join_raffle = join_raffle_decider(souped_html)
+                    if should_join_raffle:
+                        print(should_join_raffle)
+                        button.click()
+                        joined_raffles_in_cycle_counter += 1
+                        print(f"raffle {raffle_id} joined")
+                    else:
+                        raffle_id_blacklist.append(raffle_id)
+                        print(f'raffle {raffle_id} not joined, reason: not_enough_value')
+                else:
+                    print(f'Raffle {raffle_id} could not be button_found')
 
                 time.sleep(3)
 
@@ -147,3 +186,22 @@ def print_summary(total_raffles_joined_in_session, joined_raffles_in_cycle_count
     print(f'Joined raffles in current cycle: {joined_raffles_in_cycle_counter}')
     print(f'Cycle work time: {datetime.datetime.now()}')
     print('______________________________________')
+
+
+
+# raffle_items = [['secondary', 'quality6']]
+# for raffle_item in raffle_items:
+#     should_join = False
+#     print(raffle_item[0])
+#     print(raffle_item[1])
+#     if raffle_item[0] not in config.join_raffle_decider_blacklist_slot:
+#         should_join = True
+#     else:
+#         if raffle_item[1] not in config.join_raffle_decider_blacklist_quality:
+#             should_join = True
+#     print(should_join)
+
+# raffle_ids ['2R4HRD', 'G06QXG', 'FW56R0', 'TSAQ96', 'V1PY9D', 'UL8ZQL', '006VRD', 'R3B7Z6', '2V77BZ', 'S7FVYK', '8Z4RGW', 'CHFMAT', '7IV04C', 'UYV317']
+# found 14 new raffles
+
+# raffle_ids ['2R4HRD', 'G06QXG', 'FW56R0', 'TSAQ96', 'V1PY9D', 'UL8ZQL', '006VRD', 'R3B7Z6', '2V77BZ', 'S7FVYK', '8Z4RGW', 'CHFMAT', '7IV04C', 'UYV317']
