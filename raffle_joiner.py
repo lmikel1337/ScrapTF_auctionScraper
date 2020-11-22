@@ -85,9 +85,11 @@ def join_raffle_decider(souped_html):
     for raffle_item in raffle_items:
         if raffle_item[0] not in config.join_raffle_decider_blacklist_slot and raffle_item[0] is not None:
             should_join = True
+            break
         else:
             if raffle_item[1] not in config.join_raffle_decider_blacklist_quality and raffle_item[1] is not None:
                 should_join = True
+                break
     return should_join
 
 
@@ -160,7 +162,15 @@ def join_raffles(mode='one_time', loop_delay=10):
                     should_join_raffle = join_raffle_decider(souped_html)
                     if should_join_raffle:
                         print(should_join_raffle)
-                        button.click()
+                        try:
+                            button.click()
+                        except:
+                            print('==================================================')
+                            print("Failed to click the Join button")
+                            print('This could mean that this is a "Bot trap raffle"')
+                            print(f'id: {raffle_id}')
+                            print('==================================================')
+                            continue
                         joined_raffles_in_cycle_counter += 1
                         print(f"raffle {raffle_id} joined")
                     else:
@@ -175,7 +185,6 @@ def join_raffles(mode='one_time', loop_delay=10):
 
         print_summary(total_raffles_joined_in_session, joined_raffles_in_cycle_counter, timer_start, i)
     driver.quit()
-# /html/body/div[5]/div/div[3]/div[7]/div[2]/button[2]
 
 
 def print_summary(total_raffles_joined_in_session, joined_raffles_in_cycle_counter, timer_start, cycle_index):
@@ -187,21 +196,3 @@ def print_summary(total_raffles_joined_in_session, joined_raffles_in_cycle_count
     print(f'Cycle work time: {datetime.datetime.now()}')
     print('______________________________________')
 
-
-
-# raffle_items = [['secondary', 'quality6']]
-# for raffle_item in raffle_items:
-#     should_join = False
-#     print(raffle_item[0])
-#     print(raffle_item[1])
-#     if raffle_item[0] not in config.join_raffle_decider_blacklist_slot:
-#         should_join = True
-#     else:
-#         if raffle_item[1] not in config.join_raffle_decider_blacklist_quality:
-#             should_join = True
-#     print(should_join)
-
-# raffle_ids ['2R4HRD', 'G06QXG', 'FW56R0', 'TSAQ96', 'V1PY9D', 'UL8ZQL', '006VRD', 'R3B7Z6', '2V77BZ', 'S7FVYK', '8Z4RGW', 'CHFMAT', '7IV04C', 'UYV317']
-# found 14 new raffles
-
-# raffle_ids ['2R4HRD', 'G06QXG', 'FW56R0', 'TSAQ96', 'V1PY9D', 'UL8ZQL', '006VRD', 'R3B7Z6', '2V77BZ', 'S7FVYK', '8Z4RGW', 'CHFMAT', '7IV04C', 'UYV317']
