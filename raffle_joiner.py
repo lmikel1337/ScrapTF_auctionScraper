@@ -121,15 +121,16 @@ def join_raffles(mode='one_time', loop_delay=10):
 
         print('Checking for new raffles...')
         raffle_ids = get_raffle_ids(driver)
-        print(type(raffle_ids))
-        print(f'raffle_ids {raffle_ids}')
-        for id in raffle_ids:
-            if id in raffle_id_blacklist:
-                print(f'removed {id}')
+        deleted_ids_counter = 0
+        for raffle_id in raffle_ids[:]:
+            if raffle_id in raffle_id_blacklist:
                 try:
-                    raffle_ids = raffle_ids.remove(id)
+                    raffle_ids.remove(raffle_id)
+                    deleted_ids_counter += 1
                 except:
                     pass
+        print(f'Deleted {deleted_ids_counter} raffle ids')
+        print(f'raffle_ids: {raffle_ids}')
 
         if not raffle_ids:
             print(f'No new raffles found\nnext check in {loop_delay} min({(datetime.datetime.now() + datetime.timedelta(minutes=loop_delay)).strftime("%H:%M:%S")})')
@@ -149,6 +150,7 @@ def join_raffles(mode='one_time', loop_delay=10):
                 souped_html = BeautifulSoup(driver.page_source, 'html.parser')
 
                 button_found = False
+                should_wait = False
                 for xpath in config.scraptf_raffle_join_button_xpaths:
                     try:
                         button = driver.find_element_by_xpath(xpath)
@@ -164,22 +166,28 @@ def join_raffles(mode='one_time', loop_delay=10):
                         print(should_join_raffle)
                         try:
                             button.click()
+                            should_wait = True
                         except:
+                            should_wait = False
                             print('==================================================')
                             print("Failed to click the Join button")
                             print('This could mean that this is a "Bot trap raffle"')
-                            print(f'id: {raffle_id}')
+                            print(f'raffle_id: {raffle_id}')
                             print('==================================================')
                             continue
                         joined_raffles_in_cycle_counter += 1
                         print(f"raffle {raffle_id} joined")
                     else:
-                        raffle_id_blacklist.append(raffle_id)
+                        if raffle_id not in raffle_id_blacklist:
+                            raffle_id_blacklist.append(raffle_id)
+                        should_wait = False
                         print(f'raffle {raffle_id} not joined, reason: not_enough_value')
                 else:
                     print(f'Raffle {raffle_id} could not be button_found')
+                    should_wait = False
 
-                time.sleep(3)
+                if should_wait:
+                    time.sleep(3)
 
         total_raffles_joined_in_session += joined_raffles_in_cycle_counter
 
@@ -195,4 +203,3 @@ def print_summary(total_raffles_joined_in_session, joined_raffles_in_cycle_count
     print(f'Joined raffles in current cycle: {joined_raffles_in_cycle_counter}')
     print(f'Cycle work time: {datetime.datetime.now()}')
     print('______________________________________')
-
