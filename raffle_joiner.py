@@ -65,6 +65,7 @@ def get_raffled_items(souped_html):
 
         quality = re.search('item hoverable (.*) ', item_html)
         slot = re.search('data-slot="(.*)" ', item_html)
+        killstreak_tier = re.search(' killstreak(.*) ', item_html)
 
         if quality:
             quality = quality.group(1).split(' ')[0]
@@ -74,7 +75,12 @@ def get_raffled_items(souped_html):
             slot = slot.group(1).split(' ')[0].replace('\'', '').replace('"', '').replace(' ', '')
         else:
             slot = None
-        fin_items.append([slot, quality])
+        if killstreak_tier:
+            killstreak_tier = int(killstreak_tier.group(1).split(' ')[0])
+            # get_raffle_ids(killstreak_tier)
+        else:
+            killstreak_tier = None
+        fin_items.append([slot, quality, killstreak_tier])
 
     return fin_items
 
@@ -83,11 +89,14 @@ def join_raffle_decider(souped_html):
     raffle_items = get_raffled_items(souped_html)
     should_join = False
     for raffle_item in raffle_items:
+        print(f'line: 92, raffle_item: {raffle_item}')
         if raffle_item[0] not in config.join_raffle_decider_blacklist_slot and raffle_item[0] is not None:
+            print(f'line: 94, first if is successful')
             should_join = True
             break
         else:
-            if raffle_item[1] not in config.join_raffle_decider_blacklist_quality and raffle_item[1] is not None:
+            if raffle_item[1] not in config.join_raffle_decider_blacklist_quality and raffle_item[1] is not None or raffle_item[2] is not None:
+                print(f'line: 99, first if is successful')
                 should_join = True
                 break
     return should_join
@@ -146,6 +155,7 @@ def join_raffles(mode='one_time', loop_delay=10):
                 raffle_index = raffle_ids.index(raffle_id) + 1
                 print(f"{raffle_index}. opening raffle {raffle_id}")
                 url = "https://scrap.tf/raffles/{0}".format(raffle_id)
+
                 driver.get(url)
                 souped_html = BeautifulSoup(driver.page_source, 'html.parser')
 
@@ -162,8 +172,8 @@ def join_raffles(mode='one_time', loop_delay=10):
                         # print_summary(mode, scheduled_start_time, joined_raffles_in_cycle_counter, timer_start, i)
                 if button_found:
                     should_join_raffle = join_raffle_decider(souped_html)
+                    print(f'line: 172, should_join_raffle = {should_join_raffle}')
                     if should_join_raffle:
-                        print(should_join_raffle)
                         try:
                             button.click()
                             should_wait = True

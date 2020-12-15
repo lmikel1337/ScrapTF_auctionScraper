@@ -1,6 +1,6 @@
 FIREFOX_DRIVER_PATH = r'D:\\downloads\\software\\geckodriver-v0.27.0-win64\\geckodriver.exe'
 
-project_version = '0.7.0.1'
+project_version = '0.7.0.3'
 
 # the id of the auction i.e. the last parameter of the URL
 # https://scrap.tf/auctions/auction_id
@@ -18,7 +18,8 @@ scraptf_raffle_join_button_xpaths = [
     '/html/body/div[6]/div/div[3]/div[7]/div[2]/button[2]',
     '/html/body/div[4]/div/div[3]/div[5]/div[2]/button[2]',
     '/html/body/div[5]/div/div[3]/div[7]/div[2]/button[2]',
-    '/html/body/div[5]/div/div[3]/div[5]/div[2]/button[2]'
+    '/html/body/div[5]/div/div[3]/div[5]/div[2]/button[2]',
+    '/html/body/div[4]/div/div[3]/div[7]/div[2]/button[2]'
 ]
 
 join_raffle_decider_blacklist_slot = [
