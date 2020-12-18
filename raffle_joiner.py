@@ -2,10 +2,20 @@ import time
 import datetime
 from selenium import webdriver
 from bs4 import BeautifulSoup
-
 import re
 
 import config
+from tg_bot import Bot
+
+
+def get_notifications_count(browser_driver):
+    print('Fetching notification count...')
+    driver = browser_driver
+    html = driver.page_source.split('</div>')
+    for div in html:
+        if 'notices-menu' in div:
+            notices_count = re.search('class="user-notices-count">(.*)</span>', div).group(1)
+    return int(notices_count)
 
 
 def get_raffle_ids(browser_driver):
@@ -127,6 +137,12 @@ def join_raffles(mode='one_time', loop_delay=10):
         timer_start = datetime.datetime.now()
 
         joined_raffles_in_cycle_counter = 0
+
+        notifications_count = get_notifications_count(driver)
+        print(f'New notifications: {notifications_count}')
+        if notifications_count != 0:
+            message_text = 'You have a new notification from Scrap.tf'
+            Bot.new_notification(notification_message=message_text)
 
         print('Checking for new raffles...')
         raffle_ids = get_raffle_ids(driver)
