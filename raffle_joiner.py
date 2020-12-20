@@ -133,6 +133,8 @@ def join_raffles(mode='one_time', loop_delay=10):
     total_raffles_joined_in_session = 0
     raffle_id_blacklist = []
 
+    notif_count_in_prev_cycle = 0
+
     for i in range(0, iter_count):
         timer_start = datetime.datetime.now()
 
@@ -141,8 +143,10 @@ def join_raffles(mode='one_time', loop_delay=10):
         notifications_count = get_notifications_count(driver)
         print(f'New notifications: {notifications_count}')
         if notifications_count != 0:
-            message_text = 'You have a new notification from Scrap.tf'
-            Bot.new_notification(notification_message=message_text)
+            if notifications_count != notif_count_in_prev_cycle:
+                message_text = 'You have a new notification from Scrap.tf'
+                Bot.new_notification(notification_message=message_text)
+        notif_count_in_prev_cycle = notifications_count
 
         print('Checking for new raffles...')
         raffle_ids = get_raffle_ids(driver)
