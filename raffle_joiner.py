@@ -21,7 +21,16 @@ def get_notifications_count(browser_driver):
 def get_raffle_ids(browser_driver):
     print('ID acquisition started...')
     driver = browser_driver
-    driver.get("https://scrap.tf/raffles")
+
+    driver_acquired = False
+    while not driver_acquired:
+        try:
+            driver.get("https://scrap.tf/raffles")
+            driver_acquired = True
+        except:
+            print('Error loading page... attempting to load page in 30sec')
+            time.sleep(30)
+
     driver = scroll_on_page(driver)
 
     print('acquiring raffle ids...')
@@ -115,7 +124,16 @@ def join_raffle_decider(souped_html):
 def login():
     print('started login process...')
     driver = get_driver(driver_type='Firefox')
-    driver.get("https://scrap.tf/login")
+
+    driver_acquired = False
+    while not driver_acquired:
+        try:
+            driver.get("https://scrap.tf/login")
+            driver_acquired = True
+        except:
+            print('Error loading page... attempting to load page in 30sec')
+            time.sleep(30)
+
     input('Type anything when the login process is done: ')
     return driver
 
@@ -176,7 +194,15 @@ def join_raffles(mode='one_time', loop_delay=10):
                 print(f"{raffle_index}. opening raffle {raffle_id}")
                 url = "https://scrap.tf/raffles/{0}".format(raffle_id)
 
-                driver.get(url)
+                driver_acquired = False
+                while not driver_acquired:
+                    try:
+                        driver.get(url)
+                        driver_acquired = True
+                    except:
+                        print('Error loading page... attempting to load page in 30sec')
+                        time.sleep(30)
+
                 souped_html = BeautifulSoup(driver.page_source, 'html.parser')
 
                 button_found = False
