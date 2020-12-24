@@ -225,10 +225,13 @@ def join_raffles(mode='one_time', loop_delay=10):
                             should_wait = True
                         except:
                             should_wait = False
+                            if raffle_id not in raffle_id_blacklist:
+                                raffle_id_blacklist.append(raffle_id)
                             print('==================================================')
                             print("Failed to click the Join button")
                             print('This could mean that this is a "Bot trap raffle"')
                             print(f'raffle_id: {raffle_id}')
+                            print('raffle added to blacklist')
                             print('==================================================')
                             continue
                         joined_raffles_in_cycle_counter += 1
